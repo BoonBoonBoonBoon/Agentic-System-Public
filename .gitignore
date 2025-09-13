@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+.env.local
+.vscode/
+.DS_Store
+# Ignore debug outputs and transient logs
+debug/test_output.txt
+debug/*.log
+debug/*.txt
