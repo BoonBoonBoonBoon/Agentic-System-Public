@@ -1,10 +1,28 @@
-"""SupaBase Tools (moved)
+"""SupaBase Tools (LEGACY / DEPRECATED)
 
-Shared Supabase client utilities for agents.
+DEPRECATION STATUS:
+-------------------
+This module is retained only for backward compatibility with legacy agents
+that instantiated a direct Supabase client (e.g., old RAGAgent fallback and
+DBWriteAgent). The modern path routes all data access through
+`PersistenceService` + (optionally) `ReadOnlyPersistenceFacade`.
+
+Planned Removal: Phase 2 cleanup (see `docs/cleanup/README.md`).
+
+DO NOT introduce new dependencies on this module. Prefer the persistence
+adapter layer (`agent.tools.persistence.adapters.supabase_adapter`).
 """
 from supabase import create_client
 from config.settings import SUPABASE_URL, SUPABASE_KEY
 import warnings
+
+# Emit a module-level deprecation warning once at import time
+warnings.warn(
+    "agent.tools.supabase_tools is deprecated and will be removed in a future release. "
+    "Use PersistenceService + SupabaseAdapter instead (agent.tools.persistence).",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 # Suppress noisy deprecation warnings emitted by underlying HTTP libs (non-actionable here).
 warnings.filterwarnings("ignore", message="The 'timeout' parameter is deprecated", category=DeprecationWarning)
@@ -21,6 +39,11 @@ class SupabaseClient:
     """
 
     def __init__(self):
+        warnings.warn(
+            "SupabaseClient is deprecated. Use PersistenceService + SupabaseAdapter via ReadOnlyPersistenceFacade.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         if not SUPABASE_URL or not SUPABASE_KEY:
             raise EnvironmentError("SUPABASE_URL and SUPABASE_KEY must be set in env")
         self.client = create_client(SUPABASE_URL, SUPABASE_KEY)

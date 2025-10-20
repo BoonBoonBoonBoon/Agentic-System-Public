@@ -1,4 +1,6 @@
 .env
+.env.*
+.env copy
 __pycache__/
 *.pyc
 .env.local
@@ -8,3 +10,5 @@ __pycache__/
 debug/test_output.txt
 debug/*.log
 debug/*.txt
+rag_summary.json
+scripts/.last_write_task_id

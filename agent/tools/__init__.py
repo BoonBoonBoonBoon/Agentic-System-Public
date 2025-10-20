@@ -1,10 +1,14 @@
-"""Tools package for small helper modules used by agents.
+"""Minimal tools package init.
 
-Re-export common helpers for convenience and provide a discovery registry
-for local tools.
+Avoid importing legacy helpers that pull in deprecated modules (e.g.,
+`supabase_tools` which expects `config.settings`). Keep this file light so
+`import agent.tools.persistence.service` does not trigger unrelated imports.
 """
 
-from .supabase_tools import SupabaseClient, format_records
+try:  # optional exposure for convenience; don't fail package import
+	from .persistence.service import PersistenceService  # type: ignore
+except Exception:
+	PersistenceService = None  # type: ignore
 
-__all__ = ["SupabaseClient", "format_records", "registry"]
+__all__ = ["PersistenceService"]
 

@@ -1,10 +1,15 @@
 """Run a handful of live queries against the RAGAgent and print JSON envelopes.
 
-Set environment variables before running:
-  - SUPABASE_URL, SUPABASE_KEY, OPENAI_API_KEY
+Environment
+-----------
+- SUPABASE_URL, SUPABASE_KEY (or SUPABASE_SERVICE_KEY)
+- OPENAI_API_KEY
 
 Usage (PowerShell):
   $env:USE_REAL_TESTS=1; python scripts/run_live_queries.py
+
+This demo now constructs the agent via the factory to guarantee a read-only
+persistence façade is wired in (no writes possible from this flow).
 """
 import json
 import sys
@@ -15,7 +20,7 @@ repo_root = Path(__file__).resolve().parents[1]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
-from agent.operational_agents.rag_agent.rag_agent import RAGAgent
+from agent.operational_agents.factory import create_rag_agent
 
 queries = [
     # Exact id observed earlier in runs
@@ -32,7 +37,7 @@ queries = [
     "Find leads at company 'Acme'"
 ]
 
-agent = RAGAgent()
+agent = create_rag_agent(kind='supabase')
 
 for q in queries:
     print("\n--- Prompt:\n", q)

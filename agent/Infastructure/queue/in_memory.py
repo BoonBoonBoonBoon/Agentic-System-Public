@@ -4,7 +4,10 @@ import time
 import uuid
 from typing import Any, Dict, Optional
 
-from agent.Infastructure.queue.interface import QueueInterface
+try:  # Prefer shim path
+    from agent.high_level_agents.queue.interface import QueueInterface  # type: ignore
+except Exception:  # Fallback to canonical Infastructure path if needed
+    from agent.Infastructure.queue.interface import QueueInterface  # type: ignore
 
 
 class InMemoryQueue(QueueInterface):

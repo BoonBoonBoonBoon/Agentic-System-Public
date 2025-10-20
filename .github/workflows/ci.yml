@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master, develop/hazard, develop/safe ]
+    branches: [ main, migration, depreciated-models ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   tests:
@@ -24,7 +24,24 @@ jobs:
           pip install -r requirements.txt || true
       - name: Install dev dependencies
         run: |
-          pip install -r requirements-dev.txt
-      - name: Run tests
+          pip install -r requirements-dev.txt || true
+          pip install pytest pytest-cov
+      - name: Run tests with coverage (offline)
+        env:
+          USE_REAL_TESTS: '0'
         run: |
-          python -m unittest discover -v
+          pytest --cov=agent --cov=tests --cov-report=xml --cov-report=term-missing -q
+      - name: Secret scan
+        run: |
+          python scripts/secret_scan.py
+      - name: Generate coverage badge JSON
+        run: |
+          python scripts/make_coverage_badge.py
+      - name: Commit coverage badge (migration branch only)
+        if: github.ref == 'refs/heads/migration'
+        run: |
+          git config user.name github-actions
+          git config user.email actions@github.com
+          git add coverage-badge.json || true
+          git commit -m "chore: update coverage badge" || echo "No changes"
+          git push

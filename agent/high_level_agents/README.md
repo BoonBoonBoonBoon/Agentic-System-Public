@@ -1,51 +1,69 @@
-## High-level agents — overview
+High-level agents (decentralized architecture)
 
-This package contains the control and orchestration pieces that schedule,
-coordinate, and execute multi-step workflows. The implementation is intentionally
-small and modular so orchestrators and operational agents can be developed and
-tested independently.
+Overview
+--------
+The high-level agents package contains small, focused components that orchestrate
+workflows by delegating to operational agents (found in `agent/operational_agents`).
+We favor decentralization: the `CampaignManager` is thin and policy-focused;
+domain-specific `Orchestrators` implement flows; an `OrchestrationEngine` runs
+graphs; a `Dispatcher` enforces per-agent concurrency and quotas; and a
+`Scheduler` handles triggers.
 
-#### Top-level responsibilities
-- CampaignManager (`control_layer/campaign_manager.py`):
-	- Accepts external triggers or events, decides which flow to run, creates a
-		run descriptor (run_id), and either executes the orchestrator synchronously
-		or enqueues a job for async processing. Acts as the control-plane entrypoint.
+Key components
+--------------
+- control_layer/
+	- `campaign_manager.py`: thin director that receives triggers, enqueues jobs,
+		applies policy (feature flags, allow_delivery), and records run metadata.
+	- `scheduler.py`: simple in-memory scheduler for development; replace in prod.
+- orchestrators/
+	- domain orchestrators (e.g., `LeadOrchestrator`, `DeliveryOrchestrator`) that
+		subclass `BaseOrchestrator` and call operational agents via the `Registry`.
+- orchestration_engine/
+	- `runner.py`: workflow runtime that executes node graphs, enforces retries,
+		and returns canonical envelopes.
+- dispatcher/
+	- `dispatcher.py`: enforces per-agent concurrency limits and dispatches calls
+		to operational agents. Replace with an external queue for production.
+- orchestration_agents/
+	- `base_orchestrator.py`, `registry.py`, and plugin helpers. The `Registry`
+		provides discovery and metadata for operational agents.
 
-- OrchestrationEngine (`orchestration_engine/runner.py`):
-	- Executes flow definitions (graph or sequence of steps). Responsible for
-		step sequencing, conditional branching, retries, and returning a canonical
-		envelope with metadata and records.
+How components interact (simplified)
+-----------------------------------
+1. `CampaignManager` receives a trigger and enqueues a job (non-blocking).
+2. Worker picks up the job and calls `OrchestrationEngine` to execute the flow.
+3. `OrchestrationEngine` resolves node tools via `Registry.get(name)` and uses
+	 `Dispatcher.submit` to call the operational agent (respecting concurrency).
+4. Each operational agent returns a canonical envelope (metadata + records).
+5. `OrchestrationEngine` validates envelopes at node boundaries and emits
+	 monitoring events to `platform_monitoring`.
+6. Final envelope is persisted for audit and optionally delivered by the
+	 `Delivery` operational agent (gated by `CampaignManager`).
 
-- Orchestrators (`orchestrators/*.py`, `BaseOrchestrator`):
-	- Domain-level workflow classes that encapsulate business logic (e.g., lead
-		handling, delivery). Implement a `run(payload)` contract and use the
-		`Registry` to find operational agents/tools.
+Why decentralized
+------------------
+- Avoids a single monolithic controller; improves ownership and testing.
+- Enables per-agent throttling and cost controls (e.g., LLM-heavy agents).
+- Makes it easier to scale parts of the system independently.
 
-- Dispatcher (`dispatcher/dispatcher.py`):
-	- Lightweight in-process concurrency guard. Enforces per-agent concurrency
-		limits using semaphores. Intended for development; replace with an external
-		throttling service in production.
+Extending the system
+---------------------
+1. Add a new operational agent under `agent/operational_agents` and register it
+	 in the `Registry` with a capability description.
+2. If domain logic is required, add a small orchestrator under
+	 `agent/high_level_agents/orchestrators` that subclasses `BaseOrchestrator`.
+3. Update flows in `orchestration_engine` or register new flows in your
+	 orchestration definitions.
 
-- Queue & Worker (see `agent/Infastructure/queue` and `agent/Infastructure/worker`):
-	- `QueueInterface` and `InMemoryQueue` provide async handoff semantics
-		(enqueue, dequeue, visibility timeout, ack, requeue).
-	- `Worker` polls the queue, resolves the orchestrator via `Registry`, runs
-		it, and handles ack/requeue logic and monitoring events.
+Testing
+-------
+- Unit test domain orchestrators by mocking `Registry` entries for operational
+	agents.
+- Integration test the runner with an in-memory dispatcher and mocked agents.
 
-#### How these pieces work together (high-level flow)
-1. External event → `CampaignManager.ingest_event(event)` decides the flow.
-2. If async, `CampaignManager` enqueues a job on the queue; otherwise it calls
-	 the orchestrator directly.
-3. Worker dequeues a job, resolves the orchestrator (via `Registry`), and
-	 calls `orchestrator.run(payload)`.
-4. Orchestrator (or `OrchestrationEngine`) invokes operational agents (via
-	 `Registry`) to perform tasks; Dispatcher may be used to respect concurrency
-	 limits for expensive operations (LLMs, DB writes).
-5. Worker acknowledges success or requeues on transient failures; platform
-	 monitoring emits events for observability.
-
-
-
-
-
+Notes
+-----
+- This package intentionally keeps high-level code separate from operational
+	agents to reduce coupling. Replace in-memory components with production
+	equivalents (Redis queue, Prometheus, tracing) when deploying.
 

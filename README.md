@@ -1,101 +1,88 @@
-# Agentic System — Overview
+<div align="center">
 
-**Disclaimer**
+# Agentic System — Portfolio Showcase
 
+[![CI](https://github.com/BoonBoonBoonBoon/Agentic-System-Public/actions/workflows/ci.yml/badge.svg?branch=migration)](https://github.com/BoonBoonBoonBoon/Agentic-System-Public/actions/workflows/ci.yml)
+[![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/BoonBoonBoonBoon/Agentic-System-Public/migration/coverage-badge.json)](#)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](requirements.txt)
 
+</div>
 
-- This repository is a public demonstration of a private product developed by my LLC.
-- It does not reflect the current state, full functionality, or progress of the actual product under active development.
-- It does not reflect the current state, full functionality, or progress of the actual product under active development.
-- All secrets have been removed to protect confidentiality for both myself and clients.
-- Portions of the codebase and infrastructure have been modified, mocked, or simplified for privacy, testing, and demonstration purposes. 
-- This project is not open source. It is provided solely as an artistic/illustrative showcase.
-- The code in this repository will not run out-of-the-box. Users are expected to design and implement their own features, configurations, and integrations if they wish to experiment with it.
+## TL;DR (for recruiters)
+- Built a modular agent framework focused on orchestration and auditable Retrieval-Augmented Generation (RAG).
+- Emphasis on clean seams (DI/Protocols), testability, provenance, and safe-by-default patterns.
+- This repo is sanitized and portfolio-oriented: code is illustrative, not a turnkey product.
 
+What to skim (5–7 minutes):
+- `agent/operational_agents/rag_agent/rag_agent.py` — core RAG agent surface and tool wrappers.
+- `agent/tools/persistence/service.py` — adapter + service pattern (Supabase or in-memory) with read-only façade.
+- `agent/Infastructure/queue/interface.py` — clean queue protocol; infra primitives are test-friendly.
+- `platform_monitoring/exporters.py` — event logging with redaction hooks for safety.
+- `tests/test_rag_public_leads_integration.py` — how mock vs. live reads are separated.
+ - `agent/operational_agents/db_write_agent/db_write_agent.py` — minimal write agent used in tests.
+ - `scripts/secret_scan.py` — lightweight local scanner CI also runs.
 
+Deeper dive: see `docs/ARCHITECTURE.md` and `docs/CODE_TOUR.md`. For a developer-oriented roadmap, see `docs/ROADMAP.md`. For orchestration vs tools, see `docs/LANGGRAPH_VS_LANGCHAIN.md`.
 
-This repository demonstrates a modular agent framework focused on orchestration patterns, tool integration, and deterministic, auditable Retrieval-Augmented Generation (RAG) workflows. It combines lightweight infrastructure primitives, domain orchestrators, operational agents, and simple utility tools to make building and testing agentic pipelines straightforward.
+## Highlights
+- Deterministic envelope pattern (metadata + records + provenance) for inter-agent IO.
+- Read-only façades for RAG to enforce least-privilege querying.
+- Pluggable adapters (in-memory / Supabase) behind a single service interface.
+- Lightweight infra: queue/dispatcher/worker for local dev and demonstration.
+- Test toggles for “mock vs real” flows; CI runs offline tests and secret scans only.
 
-This is a provenance-first, testable RAG agent architecture using small, composable tools (LangChain-style) and an orchestration layer (LangGraph-style patterns).
+## Skills demonstrated
+- Python, async-ish orchestration patterns, test design (pytest), dependency inversion via Protocols.
+- RAG architecture, data access layering, and audit/provenance design.
+- CI/CD hygiene (secret scanning, env isolation), documentation for technical storytelling.
 
+## Architecture at a glance
+See `docs/ARCHITECTURE.md` for a one-page diagram and flow notes.
 
-**Key Features**
-- Modular RAG agent and tool wrappers (Supabase integration, deterministic query helpers).
-- Standardized JSON envelope for agent-to-agent communication with per-record provenance.
-- Registries for dynamic discovery of orchestrators, operational agents, and tools.
-- Lightweight infra primitives: in-memory queue, dispatcher, worker for dev/testing.
-- Test-friendly design with mocked vs live test toggles and example wiring for smoke tests.
+## Code tour
+Quick links and why they matter: `docs/CODE_TOUR.md`.
 
-**Quick Start (dev)**
-1. Create and activate a venv (PowerShell):
+## Demo script (talk track)
+- I included a short, offline demo flow and notes in `docs/DEMO.md` so I can walk reviewers through the design quickly.
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-```
+## Disclaimer / Ethics
+- This is a public demonstration of a private product developed by my LLC. It’s intentionally simplified and partially mocked.
+- All secrets and sensitive logs have been removed; see `docs/SANITIZATION.md` for details.
+- This repository is provided as a portfolio showcase under the MIT license; it is not positioned as production-ready.
 
-2. Copy `.env.example` to `.env` and set placeholder values (do not commit real secrets):
+## Project layout (high level)
+- `agent/` — orchestrators, registries, agents, and infra.
+  - `Infastructure/` — interfaces + primitives (queue, worker, engine stubs).
+  - `high_level_agents/` — control layer and domain orchestrators.
+  - `operational_agents/` — focused I/O (RAG agent, copywriter, db write).
+  - `tools/` — deterministic clients/helpers (persistence, data coordination).
+  - `utils/` — envelope utilities and optional schemas.
+- `platform_monitoring/` — sanitized telemetry helpers.
+- Redis (optional): see `docs/REDIS.md` for Streams topology and ops.
+- `tests/` — unit + integration (real tests gated by `USE_REAL_TESTS=1`).
+- `docs/` — architecture, code tour, demo, sanitization notes, portfolio one‑pager.
 
-```text
-# .env (example values only)
-SUPABASE_URL=https://example.supabase.co
-SUPABASE_ANON_KEY=__REDACTED__
-OPENAI_API_KEY=__REDACTED__
-```
+## How to review (suggested path)
+1. Skim `docs/PORTFOLIO.md` for the narrative (problem → solution → impact).
+2. Open `docs/ARCHITECTURE.md` for the diagram and flow.
+3. Read `agent/tools/persistence/service.py` to see the seam design (adapters/allowlists).
+4. Open `agent/operational_agents/rag_agent/rag_agent.py` for the agent shape and envelopes.
+5. Check `platform_monitoring/exporters.py` for redaction before logging.
 
-3. Run unit tests (fast, mock-based):
+## CI & safety
+- CI runs offline tests + secret scan (see `.github/workflows/ci.yml`).
+- CI, coverage, and badges documentation: `docs/CI.md`.
+- Real external calls are opt-in for local dev only: set `USE_REAL_TESTS=1` if you actually wire credentials.
+- Sanitization details and guidance: `docs/SANITIZATION.md`.
 
-```powershell
-pytest -q
-```
+## Repo metadata (suggestions)
+Add these to the GitHub repo settings (not in code):
+- Description: “Modular agent orchestration + RAG (portfolio showcase). DI, adapters, provenance, tests.”
+- Topics: `agent`, `rag`, `langchain`, `langgraph`, `supabase`, `python`, `portfolio`.
+- Pin links: `docs/ARCHITECTURE.md`, `docs/CODE_TOUR.md`, `agent/operational_agents/rag_agent/rag_agent.py`.
 
-4. For live queries (developer-only), set `USE_REAL_TESTS=1` in environment before running live scripts. Use careful credential handling and rotate keys if they leak.
+---
 
-**Project layout (high level)**
-- `agent/` — core orchestrators, registries, agents, and infra.
-	- `Infastructure/` — canonical `interfaces.py` (queue/engine/dispatcher Protocols), `queue/` (InMemoryQueue), `dispatcher/` (Dispatcher), `worker/` (Worker), `orchestration_engine/` (runner stub).
-	- `high_level_agents/` — `control_layer` (CampaignManager), `orchestrators` (BaseOrchestrator and domain flows), `registry` for flows.
-	- `operational_agents/` — focused agents (RAGAgent, copywriter, db write, delivery) that perform I/O and return canonical envelopes.
-	- `tools/` — deterministic clients and helpers (Supabase wrapper, DataCoordinator, tool discovery registry).
-	- `utils/` — `envelope.py` (Envelope dataclass and helpers) and optional `schemas.py` (pydantic models) for stricter validation.
-- `platform_monitoring/` — lightweight telemetry helpers used across the system.
-- `tests/` — unit and integration tests, with flags to gate real external calls.
-- `debug/` — local debugging scripts and captured logs (should be sanitized or removed before public release).
-
-**Core concepts**
-- Envelope pattern: a canonical JSON envelope `{ metadata, records[], status, error }` is used at component boundaries. Each record includes `provenance` (`source`, `row_id`, `row_hash`, `retrieved_at`) to support audit and deduplication.
-- Registries: dynamic discovery for tools and agents. Tools expose `TOOL` or `create_tool()` and are discovered by `agent.tools.registry`. Orchestrators are registered with the orchestrator registry used by `CampaignManager` and `Worker`.
-- Protocols & DI: `agent/Infastructure/interfaces.py` defines `QueueInterface`, `OrchestrationEngineProtocol`, and `DispatcherProtocol` to avoid circular imports and enable swapping implementations for tests and production.
-
-**End-to-end flow (concise)**
-1. External trigger (API/scheduler/webhook) calls `CampaignManager.ingest_event(event)`.
-2. `CampaignManager` resolves the named orchestrator via the orchestrator registry and creates a `run_id` + job payload.
-3. Job is enqueued via `QueueInterface.enqueue(...)` (e.g., `InMemoryQueue` in dev).
-4. A `Worker` dequeues the job, emits a `worker.job.start` event, resolves the orchestrator and calls `orch.run(payload)`.
-5. The orchestrator composes a workflow: for each node it resolves tools/agents, uses `Dispatcher.submit` to enforce concurrency, and calls operational agents.
-6. Operational agents (RAGAgent, DataCoordinator, etc.) return canonical envelopes with provenance.
-7. Orchestrator aggregates node outputs to a final envelope and returns it to the worker.
-8. Worker persists/audits the envelope (TODO: audit store), emits success/error events, and acks or requeues the job.
-9. CampaignManager or downstream systems handle delivery (gated by `allow_delivery`) and external observability consumes monitoring events.
-
-**LangGraph vs LangChain (design note)**
-- LangGraph-like layer: orchestration, flow graphs, retries, branching, and auditability (Orchestration Engine, Orchestrators).
-- LangChain-like layer: tools and LLM logic (SupabaseTool, CopyAgent, RAG-style agents). Keep prompt templates, wrapper logic, and deterministic DB queries in the tools layer.
-
-**Testing & CI**
-- Unit tests mock external services for speed and determinism; integration/live tests are gated by `USE_REAL_TESTS`.
-- Add an import-check job in CI to validate `agent/Infastructure` modules after refactors.
-
-**Security & publishing checklist**
-- Do not commit `.env` or real credentials. Add `.env` to `.gitignore` and remove any tracked `.env` (`git rm --cached .env`).
-- Remove or redact any captured logs in `debug/` before public release (e.g., `debug/test_output.txt`).
-- Run a secret scan (detect-secrets, truffleHog, or the project's custom scanners) and rotate any exposed credentials.
-- If secrets were committed historically, rewrite history using `git-filter-repo` or BFG on a mirrored clone and coordinate pushes to remotes.
-
-**Developer notes & next steps**
-- Implement or integrate a real Orchestration Engine (LangGraph or a scheduler) to replace the `runner.py` placeholder.
-- Replace `InMemoryQueue`/`Dispatcher` with production queues and rate-limiters as needed.
-- Persist envelopes and node traces to an audit store (Supabase wrappers exist in `agent/tools`).
-- Add `CONTRIBUTING.md` and `SECURITY.md` for public contributors. Consider adding a `SECURITY.md` with private reporting instructions.
+If you’re short on time, jump straight to `docs/PORTFOLIO.md` and the Code Tour. Thanks for reviewing!
 

@@ -1,15 +1,17 @@
-"""Deterministic Data Coordinator
+"""Deterministic Data Coordinator (LEGACY / DEPRECATED)
 
-Lightweight coordinator that centralizes deterministic queries against
-the Supabase-backed `leads` table. This is a minimal stub that implements
-the interface expected by `RAGAgent`:
+DEPRECATION STATUS:
+-------------------
+Kept temporarily only to support the RAGAgent legacy fallback mode when
+no `ReadOnlyPersistenceFacade` is supplied. Once all call sites migrate
+to constructing RAGAgent via the factory (`create_rag_agent`) this module
+will be removed.
 
-- constructor: DataCoordinator(supabase=SupabaseClient())
-- method: tool(args: dict|str) -> dict (envelope)
-- callable alias: __call__ = tool
+Modern Replacement:
+- Use `ReadOnlyPersistenceFacade.query()` directly, optionally wrapping
+    higher-level retrieval logic in a dedicated context builder.
 
-The coordinator normalizes a small set of allowed filters and returns a
-JSON-like envelope with metadata, records and lightweight provenance.
+Do not extend this module. It intentionally remains minimal.
 """
 from typing import Any, Dict, List, Optional
 import json

@@ -67,3 +67,11 @@ Troubleshooting
 	import logging
 	logging.basicConfig(level=logging.INFO)
 
+Contributing
+------------
+- Keep this package minimal. Add adapters for your telemetry platform rather
+	than adding platform-specific logic in orchestrators.
+
+License / Attribution
+---------------------
+This repository's existing license applies.
