@@ -2,8 +2,8 @@
 
 # Agentic System — Portfolio Showcase
 
-[![CI](https://github.com/BoonBoonBoonBoon/Agentic-System-Public/actions/workflows/ci.yml/badge.svg?branch=migration)](https://github.com/BoonBoonBoonBoon/Agentic-System-Public/actions/workflows/ci.yml)
-[![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/BoonBoonBoonBoon/Agentic-System-Public/migration/coverage-badge.json)](#)
+[![CI](https://github.com/BoonBoonBoonBoon/Agentic-System-Public/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BoonBoonBoonBoon/Agentic-System-Public/actions/workflows/ci.yml)
+[![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/BoonBoonBoonBoon/Agentic-System-Public/main/coverage-badge.json)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](requirements.txt)
 

@@ -37,8 +37,8 @@ jobs:
       - name: Generate coverage badge JSON
         run: |
           python scripts/make_coverage_badge.py
-      - name: Commit coverage badge (migration branch only)
-        if: github.ref == 'refs/heads/migration'
+      - name: Commit coverage badge (main branch only)
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name github-actions
           git config user.email actions@github.com

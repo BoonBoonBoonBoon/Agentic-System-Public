@@ -10,23 +10,22 @@ This repository uses GitHub Actions to run tests, perform a lightweight secret s
 - Runs pytest with coverage in offline mode (no live integrations)
 - Runs a secret scan (`scripts/secret_scan.py`)
 - Generates `coverage-badge.json` from `coverage.xml`
-- Commits `coverage-badge.json` back to the `migration` branch so Shields.io can render the badge
+- Commits `coverage-badge.json` back to the `main` branch so Shields.io can render the badge
 
 The workflow file lives at `.github/workflows/ci.yml`.
 
 ## Badges in README
 
-- CI: shows whether the workflow is passing on the `migration` branch
-- Coverage: reads `coverage-badge.json` from the `migration` branch via a Shields endpoint
+- CI: shows whether the workflow is passing on the `main` branch
+- Coverage: reads `coverage-badge.json` from the `main` branch via a Shields endpoint
 
 If you later switch to `main`, update both the README badges and the workflow step that commits `coverage-badge.json`.
 
-### Changing badges to track `main`
+### Changing badges to track a different branch
 
-1. Update the README badges:
-   - CI badge `?branch=migration` → `?branch=main`
-   - Coverage badge endpoint URL path `/migration/coverage-badge.json` → `/main/coverage-badge.json`
-2. In `.github/workflows/ci.yml`, change the commit condition from `refs/heads/migration` to `refs/heads/main`.
+If you temporarily want badges to track another branch (e.g., a long-lived feature branch), update:
+1. README badges to reference that branch.
+2. The commit condition in `.github/workflows/ci.yml` (e.g., `refs/heads/feature-x`).
 
 ## Local runs
 
