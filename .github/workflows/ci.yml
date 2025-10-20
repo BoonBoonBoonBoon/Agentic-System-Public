@@ -39,10 +39,17 @@ jobs:
         run: |
           python scripts/secret_scan.py
       - name: Generate coverage badge JSON
+        if: ${{ always() }}
         run: |
           python scripts/make_coverage_badge.py
+      - name: Ensure fallback coverage badge exists
+        if: ${{ always() }}
+        run: |
+          if [ ! -f coverage-badge.json ]; then
+            echo '{"schemaVersion":1,"label":"coverage","message":"unknown","color":"lightgrey"}' > coverage-badge.json
+          fi
       - name: Commit coverage badge (main branch only)
-        if: github.ref == 'refs/heads/main'
+        if: ${{ always() && github.ref == 'refs/heads/main' }}
         run: |
           git config user.name github-actions
           git config user.email actions@github.com
