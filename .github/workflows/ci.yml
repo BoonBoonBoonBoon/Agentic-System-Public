@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+# Required for the workflow to push coverage-badge.json back to the repo
+permissions:
+  contents: write
+
 jobs:
   tests:
     runs-on: ubuntu-latest
