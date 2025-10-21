@@ -1,6 +1,6 @@
 <div align="center">
 
-# Agentic System — Portfolio Showcase
+# Agentic System — Work In Progress
 
 [![CI](https://github.com/BoonBoonBoonBoon/Agentic-System-Public/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BoonBoonBoonBoon/Agentic-System-Public/actions/workflows/ci.yml)
 [![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/BoonBoonBoonBoon/Agentic-System-Public/refs/heads/main/coverage-badge.json)](#)
@@ -9,7 +9,7 @@
 
 </div>
 
-## TL;DR (for recruiters)
+## TL;DR
 - Built a modular agent framework focused on orchestration and auditable Retrieval-Augmented Generation (RAG).
 - Emphasis on clean seams (DI/Protocols), testability, provenance, and safe-by-default patterns.
 - This repo is sanitized and portfolio-oriented: code is illustrative, not a turnkey product.

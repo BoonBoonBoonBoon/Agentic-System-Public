@@ -11,7 +11,7 @@ Legend
 
 High-Priority (Phase 2)
 -----------------------
-- [ ] Remove legacy `DBWriteAgent` and `agent/tools/db_write/` directory.
+- [~] Remove legacy `DBWriteAgent` and `agent/tools/db_write/` directory.
 - [ ] Add tombstone stub raising `ImportError` with migration guidance if old import path used.
 - [ ] Purge direct Supabase client bootstrap from `RAGAgent` (require injected facade).
 - [ ] Add test asserting `RAGAgent` performs zero writes (facade denies writes intentionally).
